@@ -1,0 +1,55 @@
+# Another-flicker-script-test
+using UnityEngine;
+using System.Collections.Generic;
+
+public class Player : MonoBehaviour
+{
+    public string playerName;
+    public bool isAlive = true;
+    public bool isVisible = true;
+
+    public void ReceiveMessage(string sender, string message)
+    {
+        Debug.Log($"{sender}: {message}");
+        // Display message in UI
+    }
+
+    public void Notify(string info)
+    {
+        Debug.Log(info);
+        // Display notification in UI
+    }
+}
+
+public class ChatSystem : MonoBehaviour
+{
+    public List<(string sender, string message)> chatLog = new List<(string, string)>();
+    public List<Player> players = new List<Player>();
+
+    public void SendMessage(Player sender, string message)
+    {
+        chatLog.Add((sender.playerName, message));
+        foreach (var player in players)
+        {
+            player.ReceiveMessage(sender.playerName, message);
+        }
+    }
+
+    public void MakeDeadPlayerVisible(Player deadPlayer)
+    {
+        deadPlayer.isVisible = true;
+        foreach (var player in players)
+        {
+            if (player != deadPlayer)
+                player.Notify($"{deadPlayer.playerName} is now visible!");
+        }
+    }
+
+    public void ShowChatLog(Player requester)
+    {
+        foreach (var entry in chatLog)
+        {
+            requester.ReceiveMessage(entry.sender, entry.message);
+        }
+    }
+}
